@@ -1,7 +1,15 @@
 import os
+import sys
 import json
 import asyncio
 import logging
+
+# Add the current directory to sys.path to ensure internal 
+# modules (intelligence, perplexity) are discoverable by external MCP hosts.
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.append(current_dir)
+
 from mcp.server.fastmcp import FastMCP
 from intelligence.engine import IntelligenceEngine
 
