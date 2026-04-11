@@ -20,12 +20,21 @@ The FastAPI backend then returns the natively disambiguated intelligence JSON ar
 ### 🌐 Model Context Protocol (MCP) Standard (Universal AI Plugin)
 MCP is an open standard that allows any capable AI agent to natively hook into standalone tools. We provide a FastMCP server wrapper (`backend/mcp_server.py`) that acts as a universal bridge. 
 
-**🧠 Local Intelligence Mode (Keyless Ready)**
+[![Install with Smithery](https://smithery.ai/install-badge.svg)](https://smithery.ai/mcp/spectre-osint)
+
+**🚀 One-Click Installation (No Clone Required)**
+The fastest way to install SPECTRE as a plugin is via Smithery. You don't even need to clone the repo or install Python dependencies; Smithery handles the containerized environment for you:
+
+```bash
+npx -y @smithery/cli install spectre-osint --config GEMINI_API_KEY=your_optional_key
+```
+
+**🧠 Local Intelligence Mode (Universal Link)**
 SPECTRE is uniquely designed to empower the calling AI. While the visual dashboard uses an internal Gemini brain to organize the graph, the MCP plugin allows your primary assistant (Claude, Jarvis, etc.) to act as the "Intelligence Layer." 
 
 By returning **Raw Evidence Nodes** alongside the deep dossier, SPECTRE allows the host AI to perform identity disambiguation natively using its own context window. This makes SPECTRE **100% API-Key free** for plugin users.
 
-*Universal Integration Pattern:*
+*Manual Integration Pattern:*
 ```bash
 [YOUR-AI-COMMAND] mcp add spectre-osint -- python backend/mcp_server.py
 ```
