@@ -13,7 +13,7 @@ SPECTRE was engineered specifically to act as an **autonomous OSINT plugin for p
 To function seamlessly as a "tool" or "skill" for an external autonomous AI (like LangChain, AutoGPT, or customized assistants), SPECTRE is designed to expose its intelligence loop via a RESTful JSON bridge. Personal AIs can trigger missions asynchronously bypassing the visual frontend:
 ```json
 // Example POST /api/v1/mission
-{ "name": "Elvis Baidoo", "username": "thesirsam" }
+{ "name": "Elvis Baidoo", "username": "elvisthebuilder" }
 ```
 The FastAPI backend then returns the natively disambiguated intelligence JSON arrays directly into the AI's context window.
 
