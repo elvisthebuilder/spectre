@@ -101,3 +101,6 @@ Project SPECTRE is an OSINT security tool developed strictly for defensive analy
 
 ## 🤝 Contributing
 SPECTRE V1 is active! Pull requests for adding new Intelligence Nodes, scaling the UI, or increasing Swarm redundancy are welcome.
+
+## 📄 License
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for the full text.
