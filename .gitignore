@@ -1,0 +1,35 @@
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Node Modules
+node_modules/
+.pnpm-debug.log*
+
+# Secrets & Sessions
+.env
+*_cookies.json
+identities.json
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Build Artifacts
+dist/
+build/
+.next/
+
+# IDE & Editor Files
+.vscode/
+.idea/
+.gemini/
+*.log
