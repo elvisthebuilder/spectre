@@ -28,6 +28,8 @@ async def invoke_spectre_osint(target_name: str, target_handle: str = "", target
     
     # 1. Warm up the identity swarm proxy
     payloads = {"status": "Starting MCP-OSINT Scan..."}
+    gemini_api_key = os.getenv("GEMINI_API_KEY")
+    
     try:
         await engine.swarm_manager.replenish_swarm()
         
@@ -39,7 +41,8 @@ async def invoke_spectre_osint(target_name: str, target_handle: str = "", target
             for res in maigret_hits:
                 discovered_nodes.append({
                     "id": res["id"], "type": "SOCIAL", 
-                    "label": res["site"], "url": res["url"]
+                    "label": res["site"], "url": res["url"],
+                    "evidence": f"Found handle {target_handle} on {res['site']}"
                 })
         
         # 3. Footprint OSINT (Email)
@@ -48,10 +51,11 @@ async def invoke_spectre_osint(target_name: str, target_handle: str = "", target
             for site in holehe_hits:
                 discovered_nodes.append({
                     "id": f"email_{site}", "type": "ACCOUNT", 
-                    "label": f"{site} (Email)"
+                    "label": f"{site} (Email)",
+                    "evidence": f"Confirmed registration for {target_email} on {site}"
                 })
                 
-        # 4. Deep Intelligence (Perplexity)
+        # 4. Deep Intelligence (Perplexity Swarm)
         query = (
             f"I need a deep professional and biographical background for {target_name}. "
             f"Focus on identifying their current role, notable contributions, and public digital footprint. "
@@ -65,17 +69,22 @@ async def invoke_spectre_osint(target_name: str, target_handle: str = "", target
             "id": "pplx_dossier", "type": "INTEL", "description": "Continuous Intelligence Dossier"
         })
         
-        # 5. Semantic Disambiguation Phase
-        disambiguation = await engine.run_identity_disambiguation(
-            target_name, target_handle, target_email, 
-            discovered_nodes, pplx_answer
-        )
+        # 5. Semantic Disambiguation Phase (Optional based on API Key)
+        disambiguation = None
+        if gemini_api_key:
+            disambiguation = await engine.run_identity_disambiguation(
+                target_name, target_handle, target_email, 
+                discovered_nodes, pplx_answer
+            )
         
-        # 6. Format Response Object for the AI
+        # 6. Format Universal Response Payload
+        # We pass the 'raw_evidence_nodes' so the calling AI can use its own 
+        # reasoning to disambiguate if it's smart enough (e.g. Claude 3.5 / Jarvis).
         response_payload = {
             "target": target_name,
-            "raw_deep_intel": pplx_answer,
-            "disambiguated_personas": disambiguation.get("personas", []) if disambiguation else []
+            "intelligence_dossier": pplx_answer,
+            "raw_evidence_nodes": discovered_nodes,
+            "neural_disambiguation": disambiguation.get("personas", []) if disambiguation else "Not performed (Local Intelligence mode active)"
         }
         
         return json.dumps(response_payload, indent=2)

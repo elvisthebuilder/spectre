@@ -20,7 +20,10 @@ The FastAPI backend then returns the natively disambiguated intelligence JSON ar
 ### 🌐 Model Context Protocol (MCP) Standard (Universal AI Plugin)
 MCP is an open standard that allows any capable AI agent to natively hook into standalone tools. We provide a FastMCP server wrapper (`backend/mcp_server.py`) that acts as a universal bridge. 
 
-Whether you are building custom AI scripts (like Jarvis), using open-source agentic IDEs (Cursor, OpenHands/Cline), or enterprise CLIs (Claude Code), you can load SPECTRE into your AI instantly. Your AI assistant will automatically discover the `@mcp.tool()` on startup, allowing it to autonomously invoke deep background OSINT scans on anyone you chat about, dynamically fetching and parsing the disambiguated JSON intelligence directly into its context window.
+**🧠 Local Intelligence Mode (Keyless Ready)**
+SPECTRE is uniquely designed to empower the calling AI. While the visual dashboard uses an internal Gemini brain to organize the graph, the MCP plugin allows your primary assistant (Claude, Jarvis, etc.) to act as the "Intelligence Layer." 
+
+By returning **Raw Evidence Nodes** alongside the deep dossier, SPECTRE allows the host AI to perform identity disambiguation natively using its own context window. This makes SPECTRE **100% API-Key free** for plugin users.
 
 *Universal Integration Pattern:*
 ```bash
