@@ -10,6 +10,8 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.append(current_dir)
 
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from mcp.server.fastmcp import FastMCP
 from intelligence.engine import IntelligenceEngine
 
@@ -18,6 +20,10 @@ logging.basicConfig(level=logging.WARNING)
 
 # Initialize the FastMCP Server
 mcp = FastMCP("SPECTRE Core")
+
+# Initialize FastAPI Wrapper for Cloud Deployment
+# We use this to serve the Landing Page (Frontend) and the MCP endpoint (Backend)
+app = FastAPI(title="SPECTRE Intelligence Hub")
 
 @mcp.tool()
 async def invoke_spectre_osint(target_name: str, target_handle: str = "", target_email: str = "") -> str:
@@ -100,6 +106,17 @@ async def invoke_spectre_osint(target_name: str, target_handle: str = "", target
     except Exception as e:
         return json.dumps({"error": f"Mission failed during execution: {str(e)}"})
 
+# Mount the MCP SSE engine on a subpath
+# AI Agents will connect to https://your-domain.com/mcp
+mcp_app = mcp.sse_app()
+app.mount("/mcp", mcp_app)
+
+# Serve the built React frontend
+# In production, the 'dist' folder will be located in the frontend directory
+frontend_path = os.path.join(os.path.dirname(current_dir), 'frontend', 'dist')
+if os.path.exists(frontend_path):
+    app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
+
 if __name__ == "__main__":
     # Multi-transport support: 
     # Use 'stdio' for local CLI (default)
@@ -108,8 +125,11 @@ if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
     
     if transport_type == "http":
-        print(f"[*] Launching Remote MCP Server (HTTP/SSE) on port {port}...")
-        mcp.run(transport='http')
+        import uvicorn
+        print(f"[*] Launching Full-Stack SPECTRE Hub on port {port}...")
+        print(f"[*] Landing Page: http://0.0.0.0:{port}/")
+        print(f"[*] MCP Endpoint: http://0.0.0.0:{port}/mcp")
+        uvicorn.run(app, host="0.0.0.0", port=port)
     else:
         # Launch MCP Server natively linking stdio payload processing
         mcp.run(transport='stdio')

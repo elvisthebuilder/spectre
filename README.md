@@ -18,21 +18,35 @@ To function seamlessly as a "tool" or "skill" for an external autonomous AI (lik
 The FastAPI backend then returns the natively disambiguated intelligence JSON arrays directly into the AI's context window.
 
 ### 🌐 Model Context Protocol (MCP) Standard (Universal AI Plugin)
-MCP is an open standard that allows any capable AI agent to natively hook into standalone tools. We provide a FastMCP server wrapper (`backend/mcp_server.py`) that acts as a universal bridge. 
+SPECTRE is now a **Unified Full-Stack Hub**. A single deployment hosts your high-fidelity landing page for humans and a headless MCP endpoint for AI agents.
 
 [![Install with Smithery](https://smithery.ai/install-badge.svg)](https://smithery.ai/mcp/spectre-osint)
 
-**🚀 One-Click Installation (No Clone Required)**
-The fastest way to install SPECTRE as a plugin is via Smithery. You don't even need to clone the repo or install Python dependencies; Smithery handles the containerized environment for you:
+**🚀 One-Click Intelligence (Cloud + Local)**
+The fastest way to install SPECTRE as a plugin is via Smithery. 
 
-```bash
-npx -y @smithery/cli install spectre-osint --config GEMINI_API_KEY=your_optional_key
-```
+* **Local (Zero Setup):**
+  ```bash
+  npx -y @smithery/cli install spectre-osint --config GEMINI_API_KEY=your_optional_key
+  ```
 
-**🧠 Local Intelligence Mode (Universal Link)**
-SPECTRE is uniquely designed to empower the calling AI. While the visual dashboard uses an internal Gemini brain to organize the graph, the MCP plugin allows your primary assistant (Claude, Jarvis, etc.) to act as the "Intelligence Layer." 
+* **Remote (Always On):**
+  Deploy SPECTRE to the cloud (e.g., Railway) and point your agent to:
+  `https://your-spectre-app.up.railway.app/mcp`
 
-By returning **Raw Evidence Nodes** alongside the deep dossier, SPECTRE allows the host AI to perform identity disambiguation natively using its own context window. This makes SPECTRE **100% API-Key free** for plugin users.
+### ☁️ Deployment Guide (Railway)
+To host SPECTRE professionally with a public URL:
+1. **Fork/Clone** this repository to your GitHub.
+2. Log in to [Railway.app](https://railway.app) and click **"New Project" > "Deploy from GitHub"**.
+3. Select your SPECTRE repository.
+4. Add the following **Environment Variables** in the Railway Settings:
+   - `GEMINI_API_KEY`: Your Google GenAI key.
+   - `SPECTRE_TRANSPORT`: `http` (ensures unified web + mcp mode).
+   - `PORT`: `8000` (or leave blank, Railway provides one).
+5. **Smithery Sync**: Once live, copy your Railway URL and paste it into [Smithery.ai/new](https://smithery.ai/new) under the "Remote URL" section.
+
+**🧠 Local Intelligence Triage**
+SPECTRE automatically protects your mission costs. Remote visitors see a premium landing page, while the backend tools are hidden. Full dashboard access is automatically unlocked when you run the app on `localhost`.
 
 *Manual Integration Pattern:*
 ```bash

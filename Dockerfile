@@ -1,11 +1,29 @@
-# Use an official Python runtime as a parent image
+# --- STAGE 1: Frontend Build ---
+FROM node:20-slim AS frontend-builder
+WORKDIR /app/frontend
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Copy frontend source
+COPY frontend/package.json frontend/pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+COPY frontend/ ./
+RUN pnpm build
+
+# --- STAGE 2: Final Production Image ---
 FROM python:3.11-slim
+WORKDIR /app
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH="/app/backend:${PYTHONPATH}"
+ENV SPECTRE_TRANSPORT=http
+ENV PORT=8000
 
-# Install system dependencies for Maigret, Holehe, and Playwright
+# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libxml2-dev \
@@ -14,31 +32,26 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/dist/cache/*
 
-# Set the working directory in the container
-WORKDIR /app
-
-# Copy the backend requirements file into the container
-COPY backend/requirements.txt /app/backend/requirements.txt
-
-# Install Python dependencies
+# Copy backend requirements and install
+COPY backend/requirements.txt ./backend/requirements.txt
 RUN pip install --no-cache-dir -r backend/requirements.txt
 
-# Install Playwright and its system dependencies
+# Install Playwright and dependencies
 RUN pip install playwright && \
     playwright install-deps chromium && \
     playwright install chromium
 
-# Copy the rest of the application code
-COPY . /app
+# Copy application source
+COPY . .
 
-# Ensure intelligence is treated as a package
+# Copy built frontend assets from Stage 1
+COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
+
+# Ensure intelligence is a package
 RUN touch /app/backend/intelligence/__init__.py
 
-# Set environment path so modules are found correctly
-ENV PYTHONPATH="/app/backend:${PYTHONPATH}"
+# Expose the production port
+EXPOSE 8000
 
-# Expose the port (though for stdio MCP it isn't strictly necessary)
-# EXPOSE 8000
-
-# The default command runs the MCP server via stdio
+# Default command launches the unified FastAPI app in HTTP mode
 ENTRYPOINT ["python", "backend/mcp_server.py"]
