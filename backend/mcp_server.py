@@ -39,13 +39,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/mcp")
-async def mcp_discovery_probe():
+@app.api_route("/mcp", methods=["GET", "POST"])
+async def mcp_hub_status():
     """
-    Dummy POST handler at the hub root to satisfy protocol scanners 
-    and prevent 405 errors during Smithery initialization.
+    Status handler for the MCP endpoint.
+    GET: Displays a health message for browsers.
+    POST: Satisfies protocol-scanning probes.
     """
-    return {"status": "ok", "discovery": "/.well-known/mcp/server-card.json"}
+    return {
+        "status": "SPECTRE Intelligence Hub Active",
+        "protocol": "Model Context Protocol (Official SDK)",
+        "transport": "SSE-over-HTTP",
+        "discovery": "/.well-known/mcp/server-card.json"
+    }
 
 @app.get("/.well-known/mcp/server-card.json")
 async def get_server_card(request: Request):
