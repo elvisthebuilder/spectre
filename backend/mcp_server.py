@@ -45,7 +45,8 @@ async def get_server_card(request: Request):
     Discovery endpoint for MCP clients like Smithery.
     Advertises transport and capabilities.
     """
-    base_url = str(request.base_url).rstrip('/')
+    # Force HTTPS for the base_url since Hugging Face handles TLS termination
+    base_url = str(request.base_url).replace("http://", "https://").rstrip('/')
     return {
         "$schema": "https://static.modelcontextprotocol.io/schemas/server-card.json",
         "version": "1.0",
