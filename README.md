@@ -1,21 +1,19 @@
-# ⚡ Project SPECTRE
+---
+title: SPECTRE Intelligence Hub
+emoji: 🕵️‍♂️
+colorFrom: blue
+colorTo: purple
+sdk: docker
+app_port: 7860
+---
+
+# 🕵️‍♂️ Project SPECTRE: Intelligence Hub
 
 **Autonomous OSINT Intelligence Core & Graph Disambiguation Engine**
 
-![SPECTRE Intelligence Core](https://img.shields.io/badge/Status-V1.0%20Stable-00f2ff?style=for-the-badge) ![Python](https://img.shields.io/badge/Python-3.11+-blue?style=for-the-badge) ![React](https://img.shields.io/badge/React-ForceGraph-darkblue?style=for-the-badge)
+![SPECTRE Intelligence Core](https://img.shields.io/badge/Status-V1.2%20Stable-00f2ff?style=for-the-badge) ![Python](https://img.shields.io/badge/Python-3.11+-blue?style=for-the-badge) ![React](https://img.shields.io/badge/React-ForceGraph-darkblue?style=for-the-badge)
 
 SPECTRE is a next-generation Open Source Intelligence (OSINT) gathering framework. It moves away from static terminal spreadsheets and brings reconnaissance into the future with **real-time Socket.IO graph visualizations**, **Swarm-based Deep Intelligence gathering**, and **Neural Identity Disambiguation**.
-
-## 🧠 Why SPECTRE Exists
-SPECTRE was engineered specifically to act as an **autonomous OSINT plugin for personal AI assistants (like [Jarvis](https://github.com/elvisthebuilder/jarvis))**. As AI assistants become more agentic, they require deep contextual awareness of their host. SPECTRE safely and autonomously aggregates a user’s scattered public digital footprint into a unified, disambiguated intelligence dossier. This grants an autonomous AI the capacity to deeply understand its owner for hyper-personalized interactions, proactive assistance, and contextual memory, provided the user wishes to supply that visibility.
-
-### 🔌 API / Plugin Protocol (Agentic Integration)
-To function seamlessly as a "tool" or "skill" for an external autonomous AI (like LangChain, AutoGPT, or customized assistants), SPECTRE is designed to expose its intelligence loop via a RESTful JSON bridge. Personal AIs can trigger missions asynchronously bypassing the visual frontend:
-```json
-// Example POST /api/v1/mission
-{ "name": "Elvis Baidoo", "username": "elvisthebuilder" }
-```
-The FastAPI backend then returns the natively disambiguated intelligence JSON arrays directly into the AI's context window.
 
 ### 🌐 Model Context Protocol (MCP) Standard (Universal AI Plugin)
 SPECTRE is now a **Unified Full-Stack Hub**. A single deployment hosts your high-fidelity landing page for humans and a headless MCP endpoint for AI agents.
@@ -31,19 +29,19 @@ The fastest way to install SPECTRE as a plugin is via Smithery.
   ```
 
 * **Remote (Always On):**
-  Deploy SPECTRE to the cloud (e.g., Railway) and point your agent to:
-  `https://your-spectre-app.up.railway.app/mcp`
+  Deploy SPECTRE to the cloud and point your agent to:
+  `https://your-spectre-app.hf.space/mcp`
 
-### ☁️ Deployment Guide (Railway)
-To host SPECTRE professionally with a public URL:
+### ☁️ Deployment Guide (Hugging Face Spaces - Free)
+To host SPECTRE professionally with a public URL for **FREE** (no credit card):
 1. **Fork/Clone** this repository to your GitHub.
-2. Log in to [Railway.app](https://railway.app) and click **"New Project" > "Deploy from GitHub"**.
-3. Select your SPECTRE repository.
-4. Add the following **Environment Variables** in the Railway Settings:
+2. Go to [Hugging Face](https://huggingface.co/new-space).
+3. Select **Docker SDK** and choose the **Blank** template.
+4. Name your space (e.g., `spectre-hub`).
+5. **Connect GitHub**: Link your repository.
+6. **Add Secrets**: Go to **Settings > Variables and Secrets** and add:
    - `GEMINI_API_KEY`: Your Google GenAI key.
-   - `SPECTRE_TRANSPORT`: `http` (ensures unified web + mcp mode).
-   - `PORT`: `8000` (or leave blank, Railway provides one).
-5. **Smithery Sync**: Once live, copy your Railway URL and paste it into [Smithery.ai/new](https://smithery.ai/new) under the "Remote URL" section.
+7. **Smithery Sync**: Once live, copy your `.hf.space` URL and paste it into [Smithery.ai/new](https://smithery.ai/new) (Remote URL: `https://.../mcp`).
 
 **🧠 Local Intelligence Triage**
 SPECTRE automatically protects your mission costs. Remote visitors see a premium landing page, while the backend tools are hidden. Full dashboard access is automatically unlocked when you run the app on `localhost`.
