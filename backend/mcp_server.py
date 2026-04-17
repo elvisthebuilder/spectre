@@ -39,18 +39,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.api_route("/mcp", methods=["GET", "POST"])
+@app.get("/mcp-status")
 async def mcp_hub_status():
     """
-    Status handler for the MCP endpoint.
-    GET: Displays a health message for browsers.
-    POST: Satisfies protocol-scanning probes.
+    Dedicated status page for human visitors.
+    Moved from /mcp to avoid interfering with the protocol engine.
     """
     return {
         "status": "SPECTRE Intelligence Hub Active",
         "protocol": "Model Context Protocol (Official SDK)",
         "transport": "SSE-over-HTTP",
-        "discovery": "/.well-known/mcp/server-card.json"
+        "discovery": "/.well-known/mcp/server-card.json",
+        "endpoint": "/mcp"
     }
 
 @app.get("/.well-known/mcp/server-card.json")
