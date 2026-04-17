@@ -22,8 +22,8 @@ logging.basicConfig(level=logging.WARNING)
 # Initialize FastMCP
 mcp = FastMCP("SPECTRE Core")
 
-# Prepare the MCP SSE App First (to extract its lifespan)
-mcp_app = mcp.sse_app()
+# Prepare the MCP Streamable HTTP App First (to extract its lifespan)
+mcp_app = mcp.http_app(path="/")
 
 # Initialize FastAPI with the MCP lifespan
 app = FastAPI(
@@ -43,7 +43,7 @@ app.add_middleware(
 async def get_server_card(request: Request):
     """
     Discovery endpoint for MCP clients like Smithery.
-    Advertises transport and capabilities.
+    Advertises Streamable HTTP transport and capabilities.
     """
     # Force HTTPS for the base_url since Hugging Face handles TLS termination
     base_url = str(request.base_url).replace("http://", "https://").rstrip('/')
@@ -56,9 +56,8 @@ async def get_server_card(request: Request):
             "title": "SPECTRE Intelligence Hub"
         },
         "transport": {
-            "type": "sse",
-            "endpoint": f"{base_url}/mcp/sse",
-            "messageEndpoint": f"{base_url}/mcp/messages"
+            "type": "streamable-http",
+            "url": f"{base_url}/mcp"
         },
         "capabilities": {
             "tools": {
