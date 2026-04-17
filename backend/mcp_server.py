@@ -10,20 +10,61 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.append(current_dir)
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from mcp.server.fastmcp import FastMCP
 from intelligence.engine import IntelligenceEngine
 
-# Configure structured logging to ensure it doesn't pollute standard output
+# Configure structured logging
 logging.basicConfig(level=logging.WARNING)
 
-# Initialize the FastMCP Server
+# Initialize FastMCP
 mcp = FastMCP("SPECTRE Core")
 
-# Initialize FastAPI Wrapper for Cloud Deployment
-# We use this to serve the Landing Page (Frontend) and the MCP endpoint (Backend)
-app = FastAPI(title="SPECTRE Intelligence Hub")
+# Prepare the MCP SSE App First (to extract its lifespan)
+mcp_app = mcp.sse_app()
+
+# Initialize FastAPI with the MCP lifespan
+app = FastAPI(
+    title="SPECTRE Intelligence Hub",
+    lifespan=mcp_app.router.lifespan_context
+)
+
+# Enable CORS for Smithery and other web-based clients
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/.well-known/mcp/server-card.json")
+async def get_server_card(request: Request):
+    """
+    Discovery endpoint for MCP clients like Smithery.
+    Advertises transport and capabilities.
+    """
+    base_url = str(request.base_url).rstrip('/')
+    return {
+        "$schema": "https://static.modelcontextprotocol.io/schemas/server-card.json",
+        "version": "1.0",
+        "serverInfo": {
+            "name": "spectre-core",
+            "version": "1.3.0",
+            "title": "SPECTRE Intelligence Hub"
+        },
+        "transport": {
+            "type": "sse",
+            "endpoint": f"{base_url}/mcp/sse",
+            "messageEndpoint": f"{base_url}/mcp/messages"
+        },
+        "capabilities": {
+            "tools": {},
+            "resources": {},
+            "prompts": {}
+        }
+    }
 
 @mcp.tool()
 async def invoke_spectre_osint(target_name: str, target_handle: str = "", target_email: str = "") -> str:
@@ -106,16 +147,18 @@ async def invoke_spectre_osint(target_name: str, target_handle: str = "", target
     except Exception as e:
         return json.dumps({"error": f"Mission failed during execution: {str(e)}"})
 
-# Mount the MCP SSE engine on a subpath
-# AI Agents will connect to https://your-domain.com/mcp
-mcp_app = mcp.sse_app()
-app.mount("/mcp", mcp_app)
-
 # Serve the built React frontend
 # In production, the 'dist' folder will be located in the frontend directory
 frontend_path = os.path.join(os.path.dirname(current_dir), 'frontend', 'dist')
 if os.path.exists(frontend_path):
     app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
+else:
+    @app.get("/")
+    async def fallback_root():
+        return {"status": "SPECTRE Hub Active", "mode": "Headless (MCP Only)"}
+
+# Finally, mount the MCP app (it was initialized at the top)
+app.mount("/mcp", mcp_app)
 
 if __name__ == "__main__":
     # Multi-transport support: 
