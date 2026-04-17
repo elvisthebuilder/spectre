@@ -61,7 +61,11 @@ async def get_server_card(request: Request):
             "messageEndpoint": f"{base_url}/mcp/messages"
         },
         "capabilities": {
-            "tools": {},
+            "tools": {
+                "invoke_spectre_osint": {
+                    "description": "Run an autonomous SPECTRE reconnaissance mission using OSINT and Neural Swarm logic."
+                }
+            },
             "resources": {},
             "prompts": {}
         }
