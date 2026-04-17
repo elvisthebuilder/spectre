@@ -13,7 +13,7 @@ COPY frontend/ ./
 RUN pnpm build
 
 # --- STAGE 2: Final Production Image ---
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 # Create a non-root user (Hugging Face standard)
 RUN useradd -m -u 1000 user
