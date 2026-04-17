@@ -101,5 +101,15 @@ async def invoke_spectre_osint(target_name: str, target_handle: str = "", target
         return json.dumps({"error": f"Mission failed during execution: {str(e)}"})
 
 if __name__ == "__main__":
-    # Launch MCP Server natively linking stdio payload processing
-    mcp.run(transport='stdio')
+    # Multi-transport support: 
+    # Use 'stdio' for local CLI (default)
+    # Use 'http' (SSE) for cloud deployment (e.g. Railway, Render)
+    transport_type = os.getenv("SPECTRE_TRANSPORT", "stdio").lower()
+    port = int(os.getenv("PORT", 8000))
+    
+    if transport_type == "http":
+        print(f"[*] Launching Remote MCP Server (HTTP/SSE) on port {port}...")
+        mcp.run(transport='http')
+    else:
+        # Launch MCP Server natively linking stdio payload processing
+        mcp.run(transport='stdio')

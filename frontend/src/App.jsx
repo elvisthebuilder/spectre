@@ -17,7 +17,50 @@ import ReactMarkdown from 'react-markdown';
 
 const SOCKET_URL = 'http://localhost:8000';
 
+const LandingPage = ({ onLaunch }) => (
+  <div className="landing-page">
+    <div className="hero-glow"></div>
+    <div className="landing-content">
+      <div className="badge">Project SPECTRE V1.0</div>
+      <h1>SPECTRE: The Intelligence Layer for <span className="gradient-text">Your Personal AI</span></h1>
+      <p>
+        Harness advanced OSINT intelligence. Unveil insights, analyze digital footprints, 
+        and secure your profile with AI-driven analytics. Native support for Claude, Jarvis, and beyond.
+      </p>
+      
+      <div className="cta-group">
+        <a href="https://smithery.ai/mcp/spectre-osint" target="_blank" rel="noreferrer" className="btn btn-primary">
+          <Download size={18} /> Install Plugin
+        </a>
+        <button onClick={onLaunch} className="btn btn-secondary">
+          <Zap size={18} /> Launch Dashboard
+        </button>
+      </div>
+
+      <div className="features-grid">
+        <div className="feature-card glass">
+          <Target className="icon" size={24} />
+          <h3>Neural Recon</h3>
+          <p>Autonomous intelligence gathering using Perplexity Swarms and deep persona splitting.</p>
+        </div>
+        <div className="feature-card glass">
+          <Share2 className="icon" size={24} />
+          <h3>AI-First Core</h3>
+          <p>Built on the Model Context Protocol (MCP) for seamless integration with any AI agent.</p>
+        </div>
+        <div className="feature-card glass">
+          <Activity className="icon" size={24} />
+          <h3>Privatized Intelligence</h3>
+          <p>Your data stays on your machine. Local-first execution for maximum operational security.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 function App() {
+  const [isAppLoaded, setIsAppLoaded] = useState(false);
+  const [isLocal, setIsLocal] = useState(true); // Default to true, will update in useEffect
   const [socket, setSocket] = useState(null);
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
   const [missionLogs, setMissionLogs] = useState([]);
@@ -30,9 +73,17 @@ function App() {
   const fgRef = useRef();
   const graphContainerRef = useRef(null);
 
-  // Initialize Socket.IO
+  // Initialize Environment and Socket
   useEffect(() => {
-    // Setup resize observer for dynamic graph sizing
+    // 1. Triage: Detect if we are running locally or on the web
+    const hostname = window.location.hostname;
+    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+    setIsLocal(isLocalhost);
+    
+    // Auto-load app if on localhost
+    if (isLocalhost) setIsAppLoaded(true);
+
+    // 2. Setup resize observer for dynamic graph sizing
     const observer = new ResizeObserver(entries => {
       if (entries[0] && entries[0].contentRect) {
         setGraphDims({
@@ -51,7 +102,8 @@ function App() {
     newSocket.on('connect', () => {
       addLog("Neural Handshake Established. Secure link active.", "system");
     });
-
+    
+    /* ... existing socket handlers ... */
     newSocket.on('discovery_event', (event) => {
       if (event.type === 'NODE_FOUND') {
         const newNode = event.data;
@@ -100,7 +152,7 @@ function App() {
     });
 
     return () => newSocket.close();
-  }, []);
+  }, [graphContainerRef.current]);
 
   const addLog = (message, type = "info") => {
     setMissionLogs(prev => [{
@@ -112,6 +164,11 @@ function App() {
   };
 
   const startMission = () => {
+    // Security check: Only allow missions if local or manually explicitly authorized
+    if (!isLocal) {
+        alert("CRITICAL ERROR: Mission system is disabled in remote mode. Please download SPECTRE and run locally to activate reconnaissance swarms.");
+        return;
+    }
     if (!missionParams.name && !missionParams.handle) return;
     setMissionActive(true);
     setGraphData({ nodes: [], links: [] });
@@ -121,21 +178,36 @@ function App() {
 
   const onNodeClick = useCallback(node => {
     setSelectedNode(node);
-    // Aim at node
-    fgRef.current.centerAt(node.x, node.y, 1000);
-    fgRef.current.zoom(3, 1000);
+    if (fgRef.current) {
+      fgRef.current.centerAt(node.x, node.y, 1000);
+      fgRef.current.zoom(3, 1000);
+    }
   }, []);
+
+  // Root Triage rendering
+  if (!isAppLoaded) {
+    return <LandingPage onLaunch={() => setIsAppLoaded(true)} />;
+  }
 
   return (
     <div className="spectre-container">
       <header className="spectre-header">
-        <div className="logo">
+        <div className="logo" onClick={() => setIsAppLoaded(false)} style={{ cursor: 'pointer' }}>
           <Zap size={24} fill="#00f2ff" />
           Project Spectre
         </div>
         <div className="status-indicator">
-          <div className="dot"></div>
-          SECURE CHANNEL: {socket?.connected ? 'ACTIVE' : 'OFFLINE'}
+          {isLocal ? (
+            <>
+              <div className="dot active"></div>
+              SECURE LOCAL CHANNEL: {socket?.connected ? 'ACTIVE' : 'OFFLINE'}
+            </>
+          ) : (
+            <>
+              <AlertCircle size={14} color="#f0a500" />
+              REMOTE ACCESS: DASHBOARD READ-ONLY
+            </>
+          )}
         </div>
       </header>
 
@@ -190,30 +262,43 @@ function App() {
               <h2 style={{ color: '#00f2ff', marginBottom: '16px', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Target size={18} /> Mission Parameters
               </h2>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <input 
-                  type="text" 
-                  placeholder="Target Full Name" 
-                  className="mission-input"
-                  value={missionParams.name}
-                  onChange={e => setMissionParams({...missionParams, name: e.target.value})}
-                  style={{ background: '#0d1117', border: '1px solid #30363d', padding: '12px', color: '#fff', borderRadius: '4px' }}
-                />
-                <input 
-                  type="text" 
-                  placeholder="Primary Handle / Alias" 
-                  className="mission-input"
-                  value={missionParams.handle}
-                  onChange={e => setMissionParams({...missionParams, handle: e.target.value})}
-                  style={{ background: '#0d1117', border: '1px solid #30363d', padding: '12px', color: '#fff', borderRadius: '4px' }}
-                />
-                <button 
-                  onClick={startMission}
-                  style={{ background: '#00f2ff', color: '#05070a', border: 'none', padding: '12px', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                >
-                  <Search size={18} /> Initiate OSINT Sweep
-                </button>
-              </div>
+              {isLocal ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <input 
+                    type="text" 
+                    placeholder="Target Full Name" 
+                    className="mission-input"
+                    value={missionParams.name}
+                    onChange={e => setMissionParams({...missionParams, name: e.target.value})}
+                    style={{ background: '#0d1117', border: '1px solid #30363d', padding: '12px', color: '#fff', borderRadius: '4px' }}
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="Primary Handle / Alias" 
+                    className="mission-input"
+                    value={missionParams.handle}
+                    onChange={e => setMissionParams({...missionParams, handle: e.target.value})}
+                    style={{ background: '#0d1117', border: '1px solid #30363d', padding: '12px', color: '#fff', borderRadius: '4px' }}
+                  />
+                  <button 
+                    onClick={startMission}
+                    style={{ background: '#00f2ff', color: '#05070a', border: 'none', padding: '12px', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                  >
+                    <Search size={18} /> Initiate OSINT Sweep
+                  </button>
+                </div>
+              ) : (
+                <div style={{ textAlign: 'center', padding: '20px' }}>
+                  <AlertCircle size={32} color="#f0a500" style={{ marginBottom: '16px' }} />
+                  <p style={{ fontSize: '0.9rem', color: '#848d97', lineHeight: '1.5' }}>
+                    Mission controls are locked in <strong>Remote Mode</strong>. 
+                    Please deploy SPECTRE locally to initiate autonomous reconnaissance.
+                  </p>
+                  <a href="https://github.com/elvisthebuilder/spectre" target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ marginTop: '20px', fontSize: '0.8rem' }}>
+                    View Repository
+                  </a>
+                </div>
+              )}
             </div>
           )}
         </section>
@@ -238,11 +323,6 @@ function App() {
                     View External Dossier <ChevronRight size={14} style={{ verticalAlign: 'middle' }} />
                   </a>
                 )}
-                <button 
-                  style={{ marginTop: '24px', width: '100%', background: 'rgba(0, 242, 255, 0.1)', border: '1px solid #00f2ff', color: '#00f2ff', padding: '10px', borderRadius: '4px', fontSize: '0.8rem', cursor: 'pointer' }}
-                >
-                  Initiate Deep-Dive Sequence
-                </button>
               </div>
             ) : (
              <div style={{ color: '#848d97', fontSize: '0.85rem', textAlign: 'center', marginTop: '40px' }}>Select a node in the graph to inspect discovery details.</div>
@@ -266,7 +346,7 @@ function App() {
         </aside>
       </main>
 
-      {/* Expansion Modal Overlay */}
+      {/* Expansion Modal Overlays ... (no changes needed) */}
       {expandedPanel && (
         <div 
           style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(5, 7, 10, 0.8)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}
@@ -302,10 +382,6 @@ function App() {
                 </div>
               ) : null}
 
-              {expandedPanel === 'inspector' && !selectedNode && (
-                <div style={{ color: '#848d97', textAlign: 'center', marginTop: '100px' }}>No entity selected.</div>
-              )}
-
               {expandedPanel === 'feed' && (
                 <div>
                   {missionLogs.map(log => (
@@ -320,7 +396,6 @@ function App() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
