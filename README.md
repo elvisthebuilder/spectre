@@ -12,6 +12,7 @@ app_port: 7860
 **Autonomous OSINT Intelligence Core & Graph Disambiguation Engine**
 
 ![SPECTRE Intelligence Core](https://img.shields.io/badge/Status-V1.2%20Stable-00f2ff?style=for-the-badge) ![Python](https://img.shields.io/badge/Python-3.11+-blue?style=for-the-badge) ![React](https://img.shields.io/badge/React-ForceGraph-darkblue?style=for-the-badge)
+[![SafeSkill 91/100](https://img.shields.io/badge/SafeSkill-91%2F100_Verified%20Safe-brightgreen)](https://safeskill.dev/scan/elvisthebuilder-spectre)
 
 SPECTRE is a next-generation Open Source Intelligence (OSINT) gathering framework. It moves away from static terminal spreadsheets and brings reconnaissance into the future with **real-time Socket.IO graph visualizations**, **Swarm-based Deep Intelligence gathering**, and **Neural Identity Disambiguation**.
 
